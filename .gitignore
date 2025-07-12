@@ -1,0 +1,13 @@
+# Android
+android_fastfood_app/.gradle/
+android_fastfood_app/.idea/
+android_fastfood_app/build/
+android_fastfood_app/app/build/
+*.iml
+
+# Node.js
+backend_fastfood_app/node_modules/
+backend_fastfood_app/.env
+
+# environment files
+.env

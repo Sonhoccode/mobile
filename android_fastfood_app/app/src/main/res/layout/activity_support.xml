@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9F9F9">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="#FF6C6C"/>
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#FF6C6C"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_arrow_back"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Support"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:textColor="@android:color/white"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="invisible"/>
+    </LinearLayout>
+
+    <!-- CardView thông tin liên hệ (Expandable) -->
+    <LinearLayout
+        android:id="@+id/layoutContactInfo"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#EEEEEE"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="1dp">
+
+        <LinearLayout
+            android:id="@+id/headerContactInfo"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingLeft="10dp"
+            android:gravity="center_vertical"
+            android:background="#CCCCCC"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Thông tin liên hệ của chúng tôi"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <ImageView
+                android:id="@+id/imgDropdown"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_drop_down"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contactInfoContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email liên hệ: "
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hotline: "
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Địa chỉ: "
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- EditText nhập nội dung hỗ trợ -->
+    <EditText
+        android:id="@+id/edtSupportContent"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:hint="Bạn cần hỗ trợ điều gì?"
+        android:background="#fff"
+        android:layout_margin="8dp"
+        android:gravity="top"
+        android:textSize="15sp"
+        android:padding="10dp"
+        android:inputType="textMultiLine" />
+
+    <!-- Nút xác nhận -->
+    <Button
+        android:id="@+id/btnSendSupport"
+        android:layout_width="200dp"
+        android:layout_height="42dp"
+        android:background="@drawable/rounded_button_bg"
+        android:text="Xác nhận"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>
