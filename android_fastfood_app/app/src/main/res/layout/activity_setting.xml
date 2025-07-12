@@ -7,11 +7,6 @@
     android:layout_height="match_parent"
     android:background="#F9F9F9">
 
-    <!-- Đẩy phần trên xuống dưới một chút -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:background="#FF6C6C"/>
 
     <!-- Header -->
     <LinearLayout
@@ -144,28 +139,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Chế độ sáng/tối -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:gravity="center_vertical"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Chế độ sáng/tối"
-            android:textSize="16sp"/>
-
-        <Switch
-            android:id="@+id/switchDarkMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
 
     <!-- Đẩy phần giữa giãn xuống (dùng layout_weight) -->
     <View
@@ -184,21 +157,7 @@
         android:layout_gravity="center_horizontal"
 
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="20dp"
         android:textStyle="bold"
         android:textSize="16sp"/>
-
-
-    <!-- Thanh điều hướng dưới cùng -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:itemIconTint="@color/bottom_nav_item_color"
-        app:itemTextColor="@color/bottom_nav_item_color"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

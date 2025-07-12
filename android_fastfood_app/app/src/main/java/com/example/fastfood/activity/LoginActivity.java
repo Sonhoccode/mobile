@@ -106,11 +106,18 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences prefs = getSharedPreferences("USER_PREFS", MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         if (loggedInUser != null) {
+                            // THÊM DÒNG NÀY ĐỂ KIỂM TRA
+                            android.util.Log.d("LOGIN_DEBUG", "User ID lấy được: " + loggedInUser.getId());
+
                             editor.putString("userId", loggedInUser.getId());
                             editor.putString("userName", loggedInUser.getName());
                             editor.putString("userPhone", loggedInUser.getPhone());
+                        } else {
+                            // THÊM DÒNG NÀY ĐỂ KIỂM TRA
+                            android.util.Log.d("LOGIN_DEBUG", "Đối tượng loggedInUser là null!");
                         }
-                        editor.apply(); // Lưu lại tất cả thay đổi
+
+                        editor.commit();
 
                         // Chuyển sang màn hình chính
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const sequelize = require('../config/database');
+const bcrypt = require('bcryptjs'); // Thêm bcrypt
 
 // Lấy user theo id
 router.get('/:id', async (req, res) => {
@@ -12,37 +12,57 @@ router.get('/:id', async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error' }); }
 });
 
-// Đăng ký
-router.post('/register', async (req, res) => {
+// Cập nhật user theo id
+router.put('/:id', async (req, res) => {
   try {
-    const { name, phone, password, email, address } = req.body;
-    const exist = await User.findOne({ where: { phone } });
-    if (exist) return res.status(409).json({ message: 'Phone already registered!' });
-    const user = await User.create({ name, phone, password, email, address });
-    res.json(user);
-  } catch (e) { res.status(500).json({ message: 'Server error' }); }
+    const [updated] = await User.update(req.body, {
+      where: { id: req.params.id }
+    });
+    if (updated) {
+      const updatedUser = await User.findByPk(req.params.id);
+      res.status(200).json(updatedUser);
+    } else {
+      res.status(404).json({ message: 'User not found to update' });
+    }
+  } catch (e) {
+    res.status(500).json({ message: 'Server error on update', error: e.message });
+  }
 });
 
-// Đăng nhập
-router.post('/login', async (req, res) => {
-  try {
-    const { phone, password } = req.body;
-    const user = await User.findOne({ where: { phone, password } });
-    if (!user) return res.status(401).json({ message: 'Sai số điện thoại hoặc mật khẩu!' });
-    res.json(user);
-  } catch (e) { res.status(500).json({ message: 'Server error' }); }
-});
 
-// Đổi mật khẩu
+// **[PHẦN CẬP NHẬT QUAN TRỌNG]**
+// Đổi mật khẩu an toàn hơn
 router.post('/change-password', async (req, res) => {
   try {
     const { phone, oldPassword, newPassword } = req.body;
-    const user = await User.findOne({ where: { phone, password: oldPassword } });
-    if (!user) return res.status(401).json({ message: 'Sai mật khẩu!' });
-    user.password = newPassword;
+    
+    const user = await User.findOne({ where: { phone } });
+    if (!user) {
+      return res.status(404).json({ message: 'Không tìm thấy tài khoản.' });
+    }
+
+    // --- BẮT ĐẦU THÊM LOG ĐỂ DEBUG ---
+    console.log("--- DEBUG ĐỔI MẬT KHẨU ---");
+    console.log("Mật khẩu cũ người dùng nhập (plain text):", oldPassword);
+    console.log("Mật khẩu đã mã hóa trong DB:", user.password);
+    // --- KẾT THÚC THÊM LOG ---
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Mật khẩu cũ không đúng!' });
+    }
+    
+    user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
+    
     res.json({ message: 'Đổi mật khẩu thành công!' });
-  } catch (e) { res.status(500).json({ message: 'Server error' }); }
+  } catch (e) { 
+    res.status(500).json({ message: 'Lỗi server', error: e.message }); 
+  }
 });
+
+
+// Các hàm đăng ký, đăng nhập không cần thiết ở đây vì đã có trong authRoutes
+// ...
 
 module.exports = router;

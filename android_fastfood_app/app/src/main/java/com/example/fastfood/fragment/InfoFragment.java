@@ -1,6 +1,8 @@
 package com.example.fastfood.fragment;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import com.example.fastfood.R;
 import com.example.fastfood.data.api.FoodAPI;
 import com.example.fastfood.data.api.RetrofitClient;
 import com.example.fastfood.data.model.User;
+
+import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -62,13 +66,18 @@ public class InfoFragment extends Fragment {
         foodAPI = RetrofitClient.getApi();
         loadUserData();
 
+        // **PHẦN THÊM MỚI BẮT ĐẦU TỪ ĐÂY**
+        addTextWatcherForDate(edtDate);
+        // **PHẦN THÊM MỚI KẾT THÚC**
+
         btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-
         btnConfirm.setOnClickListener(v -> saveUserData());
-
         btnChangePassword.setOnClickListener(v -> {
-            // Tạm thời chưa chuyển ChangePasswordActivity, bạn có thể chuyển tương tự
-            Toast.makeText(getContext(), "Chức năng này cần chuyển ChangePasswordActivity thành Fragment", Toast.LENGTH_SHORT).show();
+            // Thay thế Toast cũ bằng đoạn mã điều hướng
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.nav_host_fragment, ChangePasswordFragment.newInstance())
+                    .addToBackStack(null)
+                    .commit();
         });
 
         return view;
@@ -111,7 +120,7 @@ public class InfoFragment extends Fragment {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().popBackStack(); // Quay lại sau khi cập nhật
+                    getParentFragmentManager().popBackStack();
                 } else {
                     Toast.makeText(getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
                 }
@@ -120,6 +129,49 @@ public class InfoFragment extends Fragment {
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // **PHƯƠNG THỨC THÊM MỚI**
+    private void addTextWatcherForDate(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            private String current = "";
+            private final String ddmmyyyy = "DDMMYYYY";
+            private final Calendar cal = Calendar.getInstance();
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals(current)) {
+                    String clean = s.toString().replaceAll("[^\\d.]", "");
+                    String cleanC = current.replaceAll("[^\\d.]", "");
+
+                    int cl = clean.length();
+                    int sel = cl;
+                    for (int i = 2; i <= cl && i < 6; i += 2) {
+                        sel++;
+                    }
+                    if (clean.equals(cleanC)) sel--;
+
+                    if (clean.length() < 8) {
+                        clean = clean + ddmmyyyy.substring(clean.length());
+                    }
+
+                    clean = String.format("%s/%s/%s", clean.substring(0, 2),
+                            clean.substring(2, 4),
+                            clean.substring(4, 8));
+
+                    sel = sel < 0 ? 0 : sel;
+                    current = clean;
+                    editText.setText(current);
+                    editText.setSelection(Math.min(sel, current.length()));
+                }
             }
         });
     }

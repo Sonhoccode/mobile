@@ -44,7 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         edtConfirmPassword = findViewById(R.id.edt_confirm_password);
         btnRegister = findViewById(R.id.btn_register_submit);
 
-        AuthAPI api = RetrofitClient.getAuthApi();
+        authApi = RetrofitClient.getAuthApi();
 
         ivBack.setOnClickListener(v -> finish());
 

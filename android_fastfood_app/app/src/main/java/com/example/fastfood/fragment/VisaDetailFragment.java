@@ -57,7 +57,7 @@ public class VisaDetailFragment extends Fragment {
 
         // Lấy userPhone từ SharedPreferences, sử dụng getActivity() để lấy context
         SharedPreferences prefs = getActivity().getSharedPreferences("USER_PREFS", Context.MODE_PRIVATE);
-        userPhone = prefs.getString("phone", "");
+        userPhone = prefs.getString("userPhone", "");
 
         btnAddCard.setOnClickListener(v -> {
             String cardHolder = edtCardHolder.getText().toString().trim();

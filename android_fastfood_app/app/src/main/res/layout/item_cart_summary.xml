@@ -2,11 +2,13 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingTop="16dp">
 
+    <!-- Phần chi tiết thanh toán (Tạm tính, Phí giao hàng,...) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,6 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
+            <!-- Tạm tính -->
             <TextView
                 android:id="@+id/label_subtotal"
                 android:layout_width="wrap_content"
@@ -42,6 +45,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/label_subtotal"/>
 
+            <!-- Phí giao hàng -->
             <TextView
                 android:id="@+id/label_delivery_fee"
                 android:layout_width="wrap_content"
@@ -69,6 +73,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
+            <!-- Tổng cộng -->
             <TextView
                 android:id="@+id/label_total"
                 android:layout_width="wrap_content"
@@ -93,11 +98,75 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- =================== PHẦN THÊM MỚI =================== -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phương thức thanh toán"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/rgPaymentMethod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/rbCash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thanh toán khi nhận hàng"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rbVnPay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thanh toán qua VNPay"/>
+
+                <RadioButton
+                    android:id="@+id/rbVisa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thanh toán bằng thẻ đã lưu"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+            </RadioGroup>
+
+            <Spinner
+                android:id="@+id/spinnerVisa"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:background="@drawable/bg_field"
+                android:paddingStart="8dp"/>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <!-- =================== KẾT THÚC PHẦN THÊM MỚI =================== -->
+
     <Button
         android:id="@+id/button_checkout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thanh toán"
+        android:text="Đặt hàng"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="#D32F2F"/>

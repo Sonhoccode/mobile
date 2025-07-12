@@ -4,9 +4,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,10 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.fastfood.R;
 import com.example.fastfood.data.local.CartItem;
+import com.example.fastfood.data.model.PaymentAccount;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+// **ĐÂY LÀ TÊN LỚP ĐÚNG**
 public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_FOOD_ITEM = 1;
@@ -26,28 +33,52 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private List<Object> displayList;
     private CartItemListener listener;
-
+    private List<PaymentAccount> visaCards;
 
     public interface CartItemListener {
         void onQuantityIncrease(CartItem item);
         void onQuantityDecrease(CartItem item);
         void onItemDelete(CartItem item);
+        void onCheckout(int paymentMethodId, int visaCardPosition, double totalAmount);
     }
 
+    // **ĐÂY LÀ HÀM DỰNG ĐÚNG**
     public CartAdapter(Context context, List<Object> displayList, CartItemListener listener) {
         this.context = context;
         this.displayList = displayList;
         this.listener = listener;
+        this.visaCards = new ArrayList<>();
+    }
+
+    public void setVisaCards(List<PaymentAccount> cards) {
+        this.visaCards.clear();
+        if (cards != null) {
+            this.visaCards.addAll(cards);
+        }
+        int summaryPosition = -1;
+        for (int i = 0; i < displayList.size(); i++) {
+            if (displayList.get(i) instanceof String && ((String) displayList.get(i)).equals("SUMMARY")) {
+                summaryPosition = i;
+                break;
+            }
+        }
+        if (summaryPosition != -1) {
+            notifyItemChanged(summaryPosition);
+        }
+    }
+
+    public List<PaymentAccount> getVisaCards() {
+        return this.visaCards;
     }
 
     @Override
     public int getItemViewType(int position) {
         Object item = displayList.get(position);
-        if (item instanceof String && item.equals("HEADER")) {
+        if (item instanceof String && "HEADER".equals(item)) {
             return TYPE_HEADER;
         } else if (item instanceof CartItem) {
             return TYPE_FOOD_ITEM;
-        } else if (item instanceof String && item.equals("SUMMARY")) {
+        } else if (item instanceof String && "SUMMARY".equals(item)) {
             return TYPE_SUMMARY;
         }
         return -1;
@@ -68,7 +99,6 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 View summaryView = inflater.inflate(R.layout.item_cart_summary, parent, false);
                 return new SummaryViewHolder(summaryView);
             default:
-                // Trong trường hợp an toàn, trả về một ViewHolder rỗng thay vì gây crash
                 return new RecyclerView.ViewHolder(new View(context)) {};
         }
     }
@@ -78,13 +108,10 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         int viewType = getItemViewType(position);
         switch (viewType) {
             case TYPE_FOOD_ITEM:
-                FoodItemViewHolder foodHolder = (FoodItemViewHolder) holder;
-                CartItem cartItem = (CartItem) displayList.get(position);
-                foodHolder.bind(cartItem, listener);
+                ((FoodItemViewHolder) holder).bind((CartItem) displayList.get(position), listener);
                 break;
             case TYPE_SUMMARY:
-                SummaryViewHolder summaryHolder = (SummaryViewHolder) holder;
-                summaryHolder.bind(displayList);
+                ((SummaryViewHolder) holder).bind(displayList, visaCards, listener);
                 break;
             case TYPE_HEADER:
             default:
@@ -108,11 +135,12 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             textCustomerName = itemView.findViewById(R.id.text_customer_name);
-            android.content.SharedPreferences prefs = itemView.getContext().getSharedPreferences("user_prefs", android.content.Context.MODE_PRIVATE);
-            String userName = prefs.getString("user_name", "Khách hàng");
+            android.content.SharedPreferences prefs = itemView.getContext().getSharedPreferences("USER_PREFS", android.content.Context.MODE_PRIVATE);
+            String userName = prefs.getString("userName", "Khách hàng");
             textCustomerName.setText("Anh/chị: " + userName);
         }
     }
+
     static class FoodItemViewHolder extends RecyclerView.ViewHolder {
         ImageView itemImage;
         TextView itemName, itemDescription, itemPrice, itemQuantity;
@@ -132,15 +160,11 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void bind(final CartItem item, final CartItemListener listener) {
             itemName.setText(item.name);
-            itemDescription.setText(item.notes);
+            itemDescription.setText(item.notes != null ? item.notes : "");
             itemPrice.setText(String.format(Locale.GERMAN, "%,.0fđ", item.price));
             itemQuantity.setText(String.valueOf(item.quantity));
 
-            Glide.with(itemView.getContext())
-                    .load(item.imageUrl)
-                    .placeholder(R.drawable.ic_placeholder)
-                    .error(R.drawable.ic_error)
-                    .into(itemImage);
+            Glide.with(itemView.getContext()).load(item.imageUrl).placeholder(R.drawable.ic_placeholder).error(R.drawable.ic_error).into(itemImage);
 
             btnIncrease.setOnClickListener(v -> listener.onQuantityIncrease(item));
             btnDecrease.setOnClickListener(v -> listener.onQuantityDecrease(item));
@@ -151,15 +175,22 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class SummaryViewHolder extends RecyclerView.ViewHolder {
         TextView subtotal, deliveryFee, total;
         Button checkoutButton;
+        RadioGroup rgPaymentMethod;
+        RadioButton rbVisa;
+        Spinner spinnerVisa;
+
         public SummaryViewHolder(@NonNull View itemView) {
             super(itemView);
             subtotal = itemView.findViewById(R.id.text_subtotal_value);
             deliveryFee = itemView.findViewById(R.id.text_delivery_fee_value);
             total = itemView.findViewById(R.id.text_total_value);
             checkoutButton = itemView.findViewById(R.id.button_checkout);
+            rgPaymentMethod = itemView.findViewById(R.id.rgPaymentMethod);
+            rbVisa = itemView.findViewById(R.id.rbVisa);
+            spinnerVisa = itemView.findViewById(R.id.spinnerVisa);
         }
 
-        void bind(List<Object> items) {
+        void bind(List<Object> items, List<PaymentAccount> visaCards, final CartItemListener listener) {
             double subtotalValue = 0;
             for (Object item : items) {
                 if (item instanceof CartItem) {
@@ -167,11 +198,40 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }
             double deliveryFeeValue = 15000;
-            double totalValue = subtotalValue + deliveryFeeValue;
+            final double totalValue = subtotalValue + deliveryFeeValue;
 
             subtotal.setText(String.format(Locale.GERMAN, "%,.0fđ", subtotalValue));
             deliveryFee.setText(String.format(Locale.GERMAN, "%,.0fđ", deliveryFeeValue));
             total.setText(String.format(Locale.GERMAN, "%,.0fđ", totalValue));
+
+            if (visaCards != null && !visaCards.isEmpty()) {
+                rbVisa.setVisibility(View.VISIBLE);
+                List<String> cardDisplayNames = new ArrayList<>();
+                for (PaymentAccount card : visaCards) {
+                    String lastFour = card.getCardNumber().length() > 4 ? card.getCardNumber().substring(card.getCardNumber().length() - 4) : card.getCardNumber();
+                    cardDisplayNames.add("Visa **** " + lastFour);
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(itemView.getContext(), android.R.layout.simple_spinner_item, cardDisplayNames);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerVisa.setAdapter(adapter);
+            } else {
+                rbVisa.setVisibility(View.GONE);
+                spinnerVisa.setVisibility(View.GONE);
+            }
+
+            rgPaymentMethod.setOnCheckedChangeListener((group, checkedId) -> {
+                if (checkedId == R.id.rbVisa) {
+                    spinnerVisa.setVisibility(View.VISIBLE);
+                } else {
+                    spinnerVisa.setVisibility(View.GONE);
+                }
+            });
+
+            checkoutButton.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCheckout(rgPaymentMethod.getCheckedRadioButtonId(), spinnerVisa.getSelectedItemPosition(), totalValue);
+                }
+            });
         }
     }
 }

@@ -6,10 +6,6 @@
     android:layout_height="match_parent"
     android:background="#F9F9F9">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:background="#FF6C6C"/>
 
     <!-- Header -->
     <LinearLayout

@@ -64,7 +64,7 @@ public class SupportFragment extends Fragment {
         // Lấy thông tin người dùng từ SharedPreferences
         if (getActivity() != null) {
             SharedPreferences prefs = getActivity().getSharedPreferences("USER_PREFS", Context.MODE_PRIVATE);
-            userPhone = prefs.getString("phone", "");
+            userPhone = prefs.getString("userPhone", "");
         }
 
         setupEventListeners(view);

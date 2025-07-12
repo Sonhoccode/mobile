@@ -1,10 +1,17 @@
 package com.example.fastfood.data.api;
 
+import com.example.fastfood.data.model.ApiResponse;
 import com.example.fastfood.data.model.FoodModel;
 import com.example.fastfood.data.model.PaymentAccount;
 import com.example.fastfood.data.model.ShopInfo;
 import com.example.fastfood.data.model.SupportRequest;
 import com.example.fastfood.data.model.User;
+import com.example.fastfood.data.model.ChangePasswordRequest;
+import com.example.fastfood.data.model.CreatePaymentRequest;
+import com.example.fastfood.data.model.CreatePaymentResponse;
+import com.example.fastfood.data.model.Order;
+import com.example.fastfood.data.model.OrderRequest;
+
 
 import java.util.List;
 
@@ -46,4 +53,15 @@ public interface FoodAPI {
 
     @DELETE("/api/payment-account/delete/{id}")
     Call<Void> deletePaymentAccount(@Path("id") String id);
+
+    @POST("api/users/change-password")
+    Call<ApiResponse> changePassword(@Body ChangePasswordRequest request);
+    @POST("/api/payment/create_payment_url")
+    Call<CreatePaymentResponse> createVnPayPayment(@Body CreatePaymentRequest request);
+
+    @GET("orders/history/{userId}")
+    Call<List<Order>> getOrderHistory(@Path("userId") String userId);
+
+    @POST("orders") // Endpoint để tạo đơn hàng mới
+    Call<ApiResponse> createOrder(@Body OrderRequest request);
 }

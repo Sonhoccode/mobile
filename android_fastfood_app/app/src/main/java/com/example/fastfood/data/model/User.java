@@ -3,7 +3,7 @@ package com.example.fastfood.data.model;
 import com.google.gson.annotations.SerializedName;
 
 public class User {
-    @SerializedName("_id")
+    @SerializedName("id")
     private String id;
     private String name;
     private String phone;

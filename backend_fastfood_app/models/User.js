@@ -21,6 +21,10 @@ const User = sequelize.define('User', {
   address: {
     type: DataTypes.STRING
   },
+  // **DÒNG THÊM MỚI**
+  date: {
+    type: DataTypes.STRING 
+  }
   
 }, {
   tableName: 'users',
